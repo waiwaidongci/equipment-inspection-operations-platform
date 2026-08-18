@@ -21,7 +21,13 @@ func NewStore(states []DeviceState) *Store {
 }
 
 func (store *Store) Snapshot() map[string]DeviceState {
-	return store.devices
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+	copyOfDevices := make(map[string]DeviceState, len(store.devices))
+	for code, state := range store.devices {
+		copyOfDevices[code] = state
+	}
+	return copyOfDevices
 }
 
 func (store *Store) Upsert(state DeviceState) {

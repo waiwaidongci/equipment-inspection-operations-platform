@@ -6,8 +6,12 @@ type Totals struct {
 }
 
 func Collect(states map[string]DeviceState) Totals {
-	var totals Totals
+	owned := make([]DeviceState, 0, len(states))
 	for _, state := range states {
+		owned = append(owned, state)
+	}
+	var totals Totals
+	for _, state := range owned {
 		if state.Status == "active" {
 			totals.Active++
 		} else {
