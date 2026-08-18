@@ -1,17 +1,14 @@
 package taskfanout
 
-import (
-	"errors"
-	"sync"
-)
+import "sync"
 
 func Run(inputs []string, process func(string) error) ([]string, error) {
-	results := make(chan string)
-	errorsCh := make(chan error)
+	results := make(chan string, len(inputs))
+	errorsCh := make(chan error, len(inputs))
 	var wg sync.WaitGroup
 	for _, input := range inputs {
+		wg.Add(1)
 		go func(value string) {
-			wg.Add(1)
 			defer wg.Done()
 			if err := process(value); err != nil {
 				errorsCh <- err
@@ -20,16 +17,17 @@ func Run(inputs []string, process func(string) error) ([]string, error) {
 			results <- value
 		}(input)
 	}
-	done := make(chan struct{})
-	go func() { wg.Wait(); close(results); close(done) }()
+	wg.Wait()
+	close(results)
+	close(errorsCh)
 	var out []string
 	for value := range results {
 		out = append(out, value)
 	}
-	select {
-	case <-done:
-		return out, nil
-	default:
-		return out, errors.New("fanout incomplete")
+	for err := range errorsCh {
+		if err != nil {
+			return out, err
+		}
 	}
+	return out, nil
 }

@@ -1,3 +1,3 @@
 package taskfanout
 
-func channelSize(int) int { return 0 }
+func channelSize(n int) int { return n }

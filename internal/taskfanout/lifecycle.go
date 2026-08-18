@@ -1,3 +1,3 @@
 package taskfanout
 
-func closeAfterWorkers() bool { return false }
+func closeAfterWorkers() bool { return true }
