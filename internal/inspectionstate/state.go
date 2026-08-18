@@ -14,7 +14,7 @@ func Transition(from, to Status) bool {
 	case Pending:
 		return to == Retrying || to == Failed
 	case Retrying:
-		return to == Completed || to == Failed
+		return to == Failed
 	case Failed:
 		return to == Retrying
 	default:
