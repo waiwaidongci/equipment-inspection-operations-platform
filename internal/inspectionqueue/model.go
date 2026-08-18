@@ -10,5 +10,6 @@ type Queue struct {
 }
 
 func newQueue(items []Candidate) Queue {
-	return Queue{Items: items}
+	owned := append([]Candidate(nil), items...)
+	return Queue{Items: owned}
 }
