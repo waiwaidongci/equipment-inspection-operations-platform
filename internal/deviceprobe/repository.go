@@ -18,10 +18,10 @@ func NewRepository(backend Backend) *Repository { return &Repository{backend: ba
 func (repository *Repository) Find(ctx context.Context, code string) (string, error) {
 	name, err := repository.backend.FindDevice(ctx, code)
 	if err != nil {
-		return "", fmt.Errorf("device lookup failed: %v", err)
+		return "", fmt.Errorf("device lookup failed: %w", err)
 	}
 	if name == "" {
-		return "", fmt.Errorf("device lookup failed: %v", domain.ErrNotFound)
+		return "", fmt.Errorf("device lookup failed: %w", domain.ErrNotFound)
 	}
 	return name, nil
 }
