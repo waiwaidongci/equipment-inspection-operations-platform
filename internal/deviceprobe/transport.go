@@ -8,11 +8,12 @@ type Response struct {
 }
 
 func ToResponse(name string, err error) Response {
-	if err == nil {
+	switch {
+	case err == nil:
 		return Response{Status: 200, Name: name}
-	}
-	if errors.Is(err, ErrDeviceMissing) {
+	case errors.Is(err, ErrDeviceMissing):
 		return Response{Status: 404}
+	default:
+		return Response{Status: 500}
 	}
-	return Response{Status: 500}
 }

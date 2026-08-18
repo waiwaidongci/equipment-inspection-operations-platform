@@ -3,6 +3,7 @@ package deviceprobe
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/example/inspection-platform/internal/domain"
 )
@@ -15,8 +16,11 @@ func NewService(repository *Repository) *Service { return &Service{repository: r
 
 func (service *Service) Lookup(ctx context.Context, code string) (string, error) {
 	name, err := service.repository.Find(ctx, code)
-	if errors.Is(err, domain.ErrNotFound) {
-		return "", ErrDeviceMissing
+	if err == nil {
+		return name, nil
 	}
-	return name, err
+	if errors.Is(err, domain.ErrNotFound) {
+		return "", fmt.Errorf("%w: %s", ErrDeviceMissing, code)
+	}
+	return "", err
 }

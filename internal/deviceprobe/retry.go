@@ -8,7 +8,7 @@ func Request(ctx context.Context, service *Service, code string, attempts *int) 
 		*attempts++
 		name, err := service.Lookup(ctx, code)
 		response = ToResponse(name, err)
-		if response.Status < 500 {
+		if response.Status < 500 || ctx.Err() != nil {
 			return response
 		}
 	}
