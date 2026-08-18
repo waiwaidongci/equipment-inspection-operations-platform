@@ -1,49 +1,35 @@
 package taskfanout
 
 import (
+	"errors"
 	"sync"
 )
 
 func Run(inputs []string, process func(string) error) ([]string, error) {
-	n := len(inputs)
-	results := make(chan string, n)
-	errs := make(chan error, n)
+	results := make(chan string)
+	errorsCh := make(chan error)
 	var wg sync.WaitGroup
-	wg.Add(n)
 	for _, input := range inputs {
 		go func(value string) {
+			wg.Add(1)
 			defer wg.Done()
 			if err := process(value); err != nil {
-				errs <- err
+				errorsCh <- err
 				return
 			}
 			results <- value
 		}(input)
 	}
-	go func() {
-		wg.Wait()
-		close(results)
-		close(errs)
-	}()
+	done := make(chan struct{})
+	go func() { wg.Wait(); close(results); close(done) }()
 	var out []string
-	var firstErr error
-	for results != nil || errs != nil {
-		select {
-		case value, ok := <-results:
-			if !ok {
-				results = nil
-				continue
-			}
-			out = append(out, value)
-		case err, ok := <-errs:
-			if !ok {
-				errs = nil
-				continue
-			}
-			if firstErr == nil {
-				firstErr = err
-			}
-		}
+	for value := range results {
+		out = append(out, value)
 	}
-	return out, firstErr
+	select {
+	case <-done:
+		return out, nil
+	default:
+		return out, errors.New("fanout incomplete")
+	}
 }
