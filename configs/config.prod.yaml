@@ -1,0 +1,26 @@
+server:
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+database:
+  driver: postgres
+  postgres_dsn: postgres://inspection:inspection@localhost:5432/inspection?sslmode=disable
+  max_open_conns: 20
+  max_idle_conns: 5
+
+auth:
+  jwt_secret: change-this-to-a-long-random-secret
+  token_ttl: 12h
+  default_username: admin
+  default_password: admin123
+  default_display_name: 系统管理员
+
+scheduler:
+  enabled: true
+  interval: 5m
+
+log:
+  level: info
+  format: json

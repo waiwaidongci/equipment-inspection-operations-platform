@@ -1,0 +1,26 @@
+server:
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+database:
+  driver: sqlite
+  sqlite_path: data/inspection.db
+  max_open_conns: 5
+  max_idle_conns: 2
+
+auth:
+  jwt_secret: local-development-secret-change-me
+  token_ttl: 12h
+  default_username: admin
+  default_password: admin123
+  default_display_name: 系统管理员
+
+scheduler:
+  enabled: true
+  interval: 1m
+
+log:
+  level: info
+  format: json
